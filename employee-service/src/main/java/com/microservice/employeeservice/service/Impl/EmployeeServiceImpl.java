@@ -2,10 +2,12 @@ package com.microservice.employeeservice.service.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.microservice.employeeservice.dto.APIResponseDto;
 import com.microservice.employeeservice.dto.DepartmentDto;
 import com.microservice.employeeservice.dto.EmployeeDto;
+import com.microservice.employeeservice.dto.OrganizationDto;
 import com.microservice.employeeservice.entity.Employee;
 import com.microservice.employeeservice.exception.ResourceNotFoundException;
 import com.microservice.employeeservice.mapper.AutoEmployeeMapper;
@@ -13,21 +15,26 @@ import com.microservice.employeeservice.repository.EmployeeRepository;
 import com.microservice.employeeservice.service.APIClient;
 import com.microservice.employeeservice.service.EmployeeService;
 
+import io.github.resilience4j.retry.annotation.Retry;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
-//@AllArgsConstructor
+// @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-	@Autowired
+    @Autowired
     private EmployeeRepository employeeRepository;
 
     // private RestTemplate restTemplate;
 
-    // private WebClient webClient;
+    @Autowired
+    private WebClient webClient;
 
-	@Autowired
+    @Autowired
     private APIClient apiClient;
 
-    public static final String URL = "http://localhost:8080/api/departments/";
+    public static final String ORGANIZATION_URL = "http://localhost:8083/api/organizations/";
 
     @Override
     public EmployeeDto saveEmployee(EmployeeDto employeeDto) {
@@ -53,9 +60,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return savedEmployeeDto;
     }
 
+    // @CircuitBreaker(name = "${spring.application.name}", fallbackMethod =
+    // "getDefaultDepartment")
+    @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
     @Override
     public APIResponseDto getEmployeeById(Long employeeId) {
 
+        log.info("inside getEmployeeById() method");
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("employee", "id", employeeId,
                         "employee_id_not_found".toUpperCase()));
@@ -65,9 +76,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // DepartmentDto departmentDto = responseEntity.getBody();
 
-        // DepartmentDto departmentDto =
-        // webClient.get().uri(URL.concat(employee.getDepartmentCode())).retrieve().bodyToMono(DepartmentDto.class)
-        // .block();
+        OrganizationDto organizationDto = webClient.get().uri(ORGANIZATION_URL.concat(employee.getOrganizationCode())).retrieve()
+                .bodyToMono(OrganizationDto.class)
+                .block();
 
         DepartmentDto departmentDto = apiClient.getDepartment(employee.getDepartmentCode());
 
@@ -77,9 +88,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         EmployeeDto employeeDto = AutoEmployeeMapper.MAPPER.convertEmployeeToEmployeeDto(employee);
 
-        APIResponseDto apiResponseDto = new APIResponseDto(employeeDto, departmentDto);
+        APIResponseDto apiResponseDto = new APIResponseDto(employeeDto, departmentDto, organizationDto);
 
         return apiResponseDto;
     }
 
+    public APIResponseDto getDefaultDepartment(Long employeeId, Exception exception) {
+
+        log.info("inside getDefaultDepartment() method");
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("employee", "id", employeeId,
+                        "employee_id_not_found".toUpperCase()));
+
+        OrganizationDto organizationDto = new OrganizationDto();
+        organizationDto.setOrganizationCode("XYZ_ORG");
+        organizationDto.setOrganizationName("XYZ");
+        organizationDto.setOrganizationDescription("XYZ Organiation Description");
+
+        DepartmentDto departmentDto = new DepartmentDto();
+        departmentDto.setDepartmentName("R&D");
+        departmentDto.setDepartmentCode("RD001");
+        departmentDto.setDepartmentDescription("Reasearch and Development Department");
+
+        EmployeeDto employeeDto = AutoEmployeeMapper.MAPPER.convertEmployeeToEmployeeDto(employee);
+
+        APIResponseDto apiResponseDto = new APIResponseDto(employeeDto, departmentDto, organizationDto);
+
+        return apiResponseDto;
+
+    }
 }
