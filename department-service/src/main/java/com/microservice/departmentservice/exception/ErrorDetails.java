@@ -18,7 +18,7 @@ public class ErrorDetails {
     private String errorCode;
     
     public ErrorDetails() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public ErrorDetails(LocalDateTime timestamp, String message, String path, String errorCode) {

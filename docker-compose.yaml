@@ -1,0 +1,102 @@
+
+version: '3'
+services:
+  service-registry:
+    image: service-registry
+    restart: always
+    # container_name: spring-boot-app
+    build:
+      context: .
+    ports:
+      - 8761:8761
+
+  config-server:
+    image: config-server
+    restart: always
+    # container_name: spring-boot-app
+    build:
+      context: .
+    depends_on:
+      - service-registry
+    links:
+      - service-registry
+    ports:
+      - 8888:8888
+
+  # department-service:
+  #   image: department-service
+  #   restart: always
+  #   # container_name: spring-boot-app
+  #   build:
+  #     context: .
+  #   ports:
+  #     - 8080:8080
+  #   depends_on:
+  #     - service-registry
+  #     - config-server
+  #     - mysqldb
+  #   links:
+  #     - service-registry
+  #     - config-server
+  #     - mysqldb
+  #   environment:
+  #     - MYSQL_HOST=mysqldb2
+  #     - MYSQL_USER=root
+  #     - MYSQL_PASSWORD=root
+  #     - MYSQL_PORT=3306
+  
+  # employee-service:
+  #   image: employee-service
+  #   restart: always
+  #   # container_name: spring-boot-app
+  #   build:
+  #     context: .
+  #   ports:
+  #     - 8080:8080
+  #   depends_on:
+  #     - service-registry
+  #     - config-server
+  #     - mysqldb
+  #   links:
+  #     - service-registry
+  #     - config-server
+  #     - mysqldb
+  #   environment:
+  #     - MYSQL_HOST=mysqldb2
+  #     - MYSQL_USER=root
+  #     - MYSQL_PASSWORD=root
+  #     - MYSQL_PORT=3306
+  
+  # api-gateway:
+  #   image: api-gateway
+  #   restart: always
+  #   # container_name: spring-boot-app
+  #   build:
+  #     context: .
+  #   ports:
+  #     - 8080:8080
+  #   depends_on:
+  #     - service-registry
+  #     - department-service
+  #     - employee-service
+  #   links:
+  #     - service-registry
+  #     - department-service
+  #     - employee-service
+  
+  # mysqldb:
+  #   container_name: mysqldb2
+  #   image: mysql
+  #   ports:
+  #     - 3306:3306
+  #   environment:
+  #     # - MYSQL_DATABASE=department_db
+  #     - MYSQL_ROOT_PASSWORD=root
+  
+  # next-app-demo:
+  #   image: next-app-demo
+  #   ports:
+  #     - 3000:3000
+  #   build:
+  #     context: ../next-app-demo
+  #   restart: always

@@ -1,0 +1,10 @@
+Principl and Franchise Changes
+
+1. User can add multiple po in single grn.
+
+2. Franchise Can create multiple po and on confirm of po if the "auto order genrate by outlet id" is not null the it will create new order at franchise side.
+If new order already exists then it add the po products in same order.
+
+3. If its a auto genrated order then it will create grn for franchise.
+
+4. If Grn is confirmed and that grn is with po then it will close all the mapped po.

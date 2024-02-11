@@ -1,0 +1,24 @@
+@echo off
+SET DEVELOPMENT_HOME=D:\Omkar\spring-boot-microservices
+
+cd %DEVELOPMENT_HOME%\service-registry\
+call mvn clean install
+call java -jar %DEVELOPMENT_HOME%\service-registry\target\*.jar
+
+cd %DEVELOPMENT_HOME%\config-server\
+call mvn clean install
+call java -jar %DEVELOPMENT_HOME%\config-server\target\*.jar
+
+cd %DEVELOPMENT_HOME%\department-service\
+call mvn clean install
+call java -jar %DEVELOPMENT_HOME%\department-service\target\*.jar
+
+cd %DEVELOPMENT_HOME%\employee-service\
+call mvn clean install
+call java -jar %DEVELOPMENT_HOME%\employee-service\target\*.jar
+
+cd %DEVELOPMENT_HOME%\api-gateway\
+call mvn clean install
+call java -jar %DEVELOPMENT_HOME%\api-gateway\target\*.jar
+
+call java -jar %DEVELOPMENT_HOME%\*.jar

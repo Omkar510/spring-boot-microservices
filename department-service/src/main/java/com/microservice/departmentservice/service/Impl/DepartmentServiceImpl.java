@@ -19,11 +19,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         @Override
         public DepartmentDto saveDepartment(DepartmentDto departmentDto) {
 
-//                log.info("----- Save Department -----");
+                // log.info("----- Save Department -----");
 
                 // convert departmentDto to departmentEntity
 
-//                log.info("convert departmentDto to departmentEntity");
+                // log.info("convert departmentDto to departmentEntity");
 
                 // Department department = new Department(departmentDto.getId(),
                 // departmentDto.getDepartmentName(),
@@ -31,13 +31,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 
                 Department department = AutoDepartmentMapper.MAPPER.convertDepartmentDtoToDepartment(departmentDto);
 
-//                log.info("save department data into department table");
+                // log.info("save department data into department table");
 
                 Department savedDepartment = departmentRepository.save(department);
 
                 // convert departmentEntity to departmentDto
 
-//                log.info("convert departmentEntity to departmentDto");
+                // log.info("convert departmentEntity to departmentDto");
 
                 // DepartmentDto savedDepartmentDto = new DepartmentDto(savedDepartment.getId(),
                 // savedDepartment.getDepartmentName(),
@@ -47,7 +47,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                 DepartmentDto savedDepartmentDto = AutoDepartmentMapper.MAPPER
                                 .convertDapartmentToDepartmentDto(savedDepartment);
 
-//                log.info("----- Save Department -----");
+                // log.info("----- Save Department -----");
 
                 return savedDepartmentDto;
         }
@@ -56,7 +56,8 @@ public class DepartmentServiceImpl implements DepartmentService {
         public DepartmentDto getDepartmentByCode(String departmentCode) {
 
                 Department department = departmentRepository.findByDepartmentCode(departmentCode)
-                               .orElseThrow(() -> new ResourceNotFoundException("department", "departmentCode", departmentCode, "department_code_not_found".toUpperCase()));
+                                .orElseThrow(() -> new ResourceNotFoundException("department", "departmentCode",
+                                                departmentCode, "department_code_not_found".toUpperCase()));
 
                 // DepartmentDto departmentDto = new DepartmentDto(department.getId(),
                 // department.getDepartmentName(),
